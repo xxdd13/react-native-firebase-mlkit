@@ -5,6 +5,7 @@
 
 #import <FirebaseCore/FirebaseCore.h>
 #import <FirebaseMLVision/FirebaseMLVision.h>
+#import <FirebaseMLVision/MLNLTranslate.h>
 
 @implementation RNMlKit
 
