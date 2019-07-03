@@ -5,7 +5,7 @@
 
 #import <FirebaseCore/FirebaseCore.h>
 #import <FirebaseMLVision/FirebaseMLVision.h>
-#import <FirebaseMLVision/MLNLTranslate.h>
+#import <FirebaseMLNLTranslate/FirebaseMLNLTranslate.h>
 
 @implementation RNMlKit
 
@@ -183,5 +183,40 @@ RCT_REMAP_METHOD(deviceTextRecognition, deviceTextRecognition:(NSString *)imageP
     });
     
 }
+
+RCT_REMAP_METHOD(deviceTextTranslation, deviceTextTranslation:(NSString *)text resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    if (!text) {
+        resolve(@NO);
+        return;
+    }
+
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+
+        let options = TranslatorOptions(sourceLanguage: .en, targetLanguage: .de)
+        let englishGermanTranslator = NaturalLanguage.naturalLanguage().translator(options: options)
+
+        let conditions = ModelDownloadConditions(
+            allowsCellularAccess: false,
+            allowsBackgroundDownloading: true
+        )
+        englishGermanTranslator.downloadModelIfNeeded(with: conditions) { error in
+            guard error == nil else { return }
+
+            // Model downloaded successfully. Okay to start translating.
+
+            englishGermanTranslator.translate(text) { translatedText, error in
+                guard error == nil, let translatedText = translatedText else { return }
+
+                // Translation succeeded.
+                resolve(translatedText);
+            }
+
+        }
+
+    });
+
+}
+
 
 @end
